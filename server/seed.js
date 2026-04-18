@@ -61,19 +61,19 @@ const users = [
 
 const buildProducts = (farmerIds) => {
   const base = [
-    ['Organic Tomatoes', 'Fresh red tomatoes harvested at sunrise.', 'Vegetables', 42, 34, 20, 'kg', 48, 1740045248323, farmerIds[0]],
-    ['Green Spinach', 'Leafy spinach bundles rich in iron.', 'Vegetables', 28, 22, 15, 'kg', 22, 1740145248323, farmerIds[0]],
-    ['Farm Mangoes', 'Naturally ripened Alphonso mangoes.', 'Fruits', 140, 120, 15, 'kg', 30, 1740245248323, farmerIds[1]],
-    ['Bananas', 'Sweet bananas packed from the same day harvest.', 'Fruits', 55, 48, 20, 'dozen', 18, 1740345248323, farmerIds[1]],
-    ['Brown Rice', 'Stone-milled fragrant brown rice.', 'Grains', 70, 62, 50, 'kg', 60, 1740445248323, farmerIds[0]],
-    ['Cow Milk', 'Fresh full-cream milk delivered chilled.', 'Dairy', 65, 58, 25, 'litre', 25, 1740545248323, farmerIds[1]],
-    ['Turmeric Powder', 'Sun-dried turmeric ground in small batches.', 'Spices', 180, 160, 10, 'kg', 15, 1740645248323, farmerIds[0]],
-    ['Potatoes', 'Firm potatoes suitable for home cooking.', 'Vegetables', 30, 25, 40, 'kg', 80, 1740745248323, farmerIds[1]],
-    ['Red Onions', 'Sharp and fresh onions from local fields.', 'Vegetables', 36, 30, 30, 'kg', 52, 1740845248323, farmerIds[0]],
-    ['Free Range Eggs', 'Clean, farm-packed eggs.', 'Dairy', 78, 68, 10, 'dozen', 12, 1740945248323, farmerIds[1]]
+    ['Organic Tomatoes', 'Fresh red tomatoes harvested at sunrise.', 'Vegetables', 42, 34, 20, 'kg', 48, 1740045248323, farmerIds[0], 'Nashik, Maharashtra'],
+    ['Green Spinach', 'Leafy spinach bundles rich in iron.', 'Vegetables', 28, 22, 15, 'kg', 22, 1740145248323, farmerIds[0], 'Nashik, Maharashtra'],
+    ['Farm Mangoes', 'Naturally ripened Alphonso mangoes.', 'Fruits', 140, 120, 15, 'kg', 30, 1740245248323, farmerIds[1], 'Karnal, Haryana'],
+    ['Bananas', 'Sweet bananas packed from the same day harvest.', 'Fruits', 55, 48, 20, 'piece', 18, 1740345248323, farmerIds[1], 'Karnal, Haryana'],
+    ['Brown Rice', 'Stone-milled fragrant brown rice.', 'Grains', 70, 62, 50, 'kg', 60, 1740445248323, farmerIds[0], 'Nashik, Maharashtra'],
+    ['Cow Milk', 'Fresh full-cream milk delivered chilled.', 'Dairy', 65, 58, 25, 'litre', 25, 1740545248323, farmerIds[1], 'Karnal, Haryana'],
+    ['Turmeric Powder', 'Sun-dried turmeric ground in small batches.', 'Spices', 180, 160, 10, 'kg', 15, 1740645248323, farmerIds[0], 'Nashik, Maharashtra'],
+    ['Potatoes', 'Firm potatoes suitable for home cooking.', 'Vegetables', 30, 25, 40, 'kg', 80, 1740745248323, farmerIds[1], 'Karnal, Haryana'],
+    ['Red Onions', 'Sharp and fresh onions from local fields.', 'Vegetables', 36, 30, 30, 'kg', 52, 1740845248323, farmerIds[0], 'Nashik, Maharashtra'],
+    ['Free Range Eggs', 'Clean, farm-packed eggs.', 'Dairy', 78, 68, 10, 'piece', 12, 1740945248323, farmerIds[1], 'Karnal, Haryana']
   ];
 
-  return base.map(([name, description, category, price, bulkPrice, minBulkQty, unit, quantity, seed, farmerId]) => {
+  return base.map(([name, description, category, price, bulkPrice, minBulkQty, unit, quantity, seed, farmerId, location]) => {
     const product = {
       name,
       description,
@@ -84,6 +84,7 @@ const buildProducts = (farmerIds) => {
       unit,
       quantity,
       farmerId,
+      location,
       images: [sampleImage(seed)],
       isAvailable: quantity > 0
     };
