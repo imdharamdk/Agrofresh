@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const bcrypt = require('bcryptjs');
 const connectDB = require('./config/db');
 const User = require('./models/User');
 const Product = require('./models/Product');
@@ -100,7 +101,14 @@ const seed = async () => {
     await Product.deleteMany();
     await User.deleteMany({ email: { $in: users.map((user) => user.email) } });
 
-    const createdUsers = await User.insertMany(users);
+    const usersWithHashedPasswords = await Promise.all(
+      users.map(async (user) => ({
+        ...user,
+        password: await bcrypt.hash(user.password, 10)
+      }))
+    );
+
+    const createdUsers = await User.insertMany(usersWithHashedPasswords);
     const farmers = createdUsers.filter((user) => user.role === 'farmer');
     const products = buildProducts(farmers.map((user) => user._id));
 
