@@ -22,53 +22,98 @@ const FarmerDashboardPage = () => {
   }), [products, orders]);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-10 px-4 py-12">
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="card"><p className="text-sm text-slate-500">Total Products</p><h2 className="mt-3 text-4xl font-black text-moss">{stats.totalProducts}</h2></div>
-        <div className="card"><p className="text-sm text-slate-500">Total Orders</p><h2 className="mt-3 text-4xl font-black text-moss">{stats.totalOrders}</h2></div>
-        <div className="card"><p className="text-sm text-slate-500">Pending Orders</p><h2 className="mt-3 text-4xl font-black text-moss">{stats.pendingOrders}</h2></div>
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 md:py-12">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="card p-4 md:p-6">
+          <p className="text-xs text-slate-500 md:text-sm">Products</p>
+          <h2 className="mt-2 text-3xl font-black text-moss md:text-4xl">{stats.totalProducts}</h2>
+        </div>
+        <div className="card p-4 md:p-6">
+          <p className="text-xs text-slate-500 md:text-sm">Orders</p>
+          <h2 className="mt-2 text-3xl font-black text-moss md:text-4xl">{stats.totalOrders}</h2>
+        </div>
+        <div className="card p-4 md:p-6">
+          <p className="text-xs text-slate-500 md:text-sm">Pending</p>
+          <h2 className="mt-2 text-3xl font-black text-amber-600 md:text-4xl">{stats.pendingOrders}</h2>
+        </div>
       </div>
 
+      {/* Products */}
       <section className="card space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-slate-900">My Products</h2>
-          <Link to="/dashboard/farmer/products/add" className="btn-primary">Add Product</Link>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-black text-slate-900 md:text-2xl">My Products</h2>
+          <Link to="/dashboard/farmer/products/add" className="btn-primary py-2 text-sm">+ Add</Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-slate-500">
-                <th className="py-3">Product</th>
-                <th className="py-3">Price</th>
-                <th className="py-3">Bulk</th>
-                <th className="py-3">Stock</th>
-                <th className="py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+
+        {products.length === 0 ? (
+          <p className="text-sm text-slate-500">No products yet.</p>
+        ) : (
+          <>
+            {/* Mobile: card list */}
+            <div className="space-y-3 md:hidden">
               {products.map((product) => (
-                <tr key={product._id} className="border-b border-slate-50">
-                  <td className="py-3 font-semibold text-slate-900">{product.name}</td>
-                  <td className="py-3">₹{product.price}/{product.unit}</td>
-                  <td className="py-3">{product.minBulkQty ? `₹${product.bulkPrice} from ${product.minBulkQty}` : 'N/A'}</td>
-                  <td className="py-3">{product.quantity}</td>
-                  <td className="py-3"><Link className="font-semibold text-leaf" to={`/dashboard/farmer/products/edit/${product._id}`}>Edit</Link></td>
-                </tr>
+                <div key={product._id} className="rounded-2xl border border-slate-100 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-slate-900">{product.name}</p>
+                      <p className="mt-1 text-sm text-slate-500">₹{product.price}/{product.unit} · Stock: {product.quantity}</p>
+                      {product.minBulkQty > 0 && (
+                        <p className="text-xs text-blue-600">Bulk: ₹{product.bulkPrice} from {product.minBulkQty}</p>
+                      )}
+                    </div>
+                    <Link className="text-sm font-semibold text-leaf shrink-0" to={`/dashboard/farmer/products/edit/${product._id}`}>Edit</Link>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-500">
+                    <th className="py-3 pr-4">Product</th>
+                    <th className="py-3 pr-4">Price</th>
+                    <th className="py-3 pr-4">Bulk</th>
+                    <th className="py-3 pr-4">Stock</th>
+                    <th className="py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product._id} className="border-b border-slate-50">
+                      <td className="py-3 pr-4 font-semibold text-slate-900">{product.name}</td>
+                      <td className="py-3 pr-4">₹{product.price}/{product.unit}</td>
+                      <td className="py-3 pr-4">{product.minBulkQty ? `₹${product.bulkPrice} from ${product.minBulkQty}` : 'N/A'}</td>
+                      <td className="py-3 pr-4">{product.quantity}</td>
+                      <td className="py-3">
+                        <Link className="font-semibold text-leaf" to={`/dashboard/farmer/products/edit/${product._id}`}>Edit</Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
 
+      {/* Orders */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-black text-slate-900">Incoming Orders</h2>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <h2 className="text-xl font-black text-slate-900 md:text-2xl">Incoming Orders</h2>
+        {orders.length === 0 && <p className="text-sm text-slate-500">No orders yet.</p>}
+        <div className="grid gap-5 lg:grid-cols-2">
           {orders.map((order) => (
             <OrderCard key={order._id} order={order}>
-              <select className="input mt-4" value={order.status} onChange={async (e) => { await orderApi.updateStatus(order._id, { status: e.target.value }); loadData(); }}>
-                <option value="pending">pending</option>
-                <option value="confirmed">confirmed</option>
-                <option value="cancelled">cancelled</option>
+              <select
+                className="input mt-4 text-sm"
+                value={order.status}
+                onChange={async (e) => { await orderApi.updateStatus(order._id, { status: e.target.value }); loadData(); }}
+              >
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
             </OrderCard>
           ))}
