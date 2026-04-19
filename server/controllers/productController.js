@@ -97,6 +97,11 @@ const assignProductFields = (target, payload, owner) => {
 
   if (imageUrl) {
     target.imageUrl = imageUrl;
+    // Also push into images[] so frontend product.images[0].url works
+    const alreadyExists = target.images?.some((img) => img.url === imageUrl);
+    if (!alreadyExists) {
+      target.images = [{ url: imageUrl, public_id: '' }, ...(target.images || [])].slice(0, 5);
+    }
   } else if (!target.imageUrl && target.images?.length) {
     target.imageUrl = target.images[0].url;
   }
