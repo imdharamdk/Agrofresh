@@ -52,5 +52,9 @@ export const adminApi = {
   users: () => api.get('/admin/users'),
   analytics: () => api.get('/admin/analytics'),
   orders: () => api.get('/admin/orders'),
+  products: () => api.get('/admin/products'),
+  createProduct: (payload) => api.post('/admin/products', payload, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  updateProduct: (id, payload) => api.put(`/admin/products/${id}`, payload, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  deleteProduct: (id) => api.delete(`/admin/products/${id}`),
   verifyFarmer: (id, payload) => api.put(`/admin/users/${id}/verify`, payload)
 };

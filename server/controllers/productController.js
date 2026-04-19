@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const User = require('../models/User');
 const { cloudinary } = require('../config/cloudinary');
 const asyncHandler = require('../utils/asyncHandler');
 const sendResponse = require('../utils/response');
@@ -10,10 +11,12 @@ const normalizeUploadedImages = (files) => {
     return [];
   }
 
-  return files.map((file) => ({
-    url: file.path || file.secure_url,
-    public_id: file.filename || file.public_id || ''
-  }));
+  return files
+    .map((file) => ({
+      url: file.path || file.secure_url || '',
+      public_id: file.filename || file.public_id || ''
+    }))
+    .filter((image) => image.url);
 };
 
 const removeCloudinaryImages = async (images) => {
@@ -28,12 +31,39 @@ const removeCloudinaryImages = async (images) => {
 
 const toBoolean = (value) => value === true || value === 'true';
 
-const assignProductFields = (target, payload, files, user) => {
+const canManageProduct = (actor, product) => (
+  actor?.role === 'admin' || product.farmerId.toString() === actor?._id?.toString()
+);
+
+const resolveOwnerForAdmin = async (farmerId) => {
+  if (!farmerId) {
+    throw new Error('farmerId is required for admin product management');
+  }
+
+  const owner = await User.findById(farmerId);
+
+  if (!owner || owner.role !== 'farmer') {
+    throw new Error('Selected farmer was not found');
+  }
+
+  return owner;
+};
+
+const resolveProductOwner = async (actor, farmerId, fallbackOwnerId) => {
+  if (actor.role === 'admin') {
+    const selectedOwnerId = farmerId || fallbackOwnerId;
+    return resolveOwnerForAdmin(selectedOwnerId);
+  }
+
+  return actor;
+};
+
+const assignProductFields = (target, payload, files, owner) => {
   const newImages = normalizeUploadedImages(files);
   const hasUploadedImages = newImages.length > 0;
   const imageUrl = String(payload.imageUrl || '').trim();
   const harvestDate = parseHarvestDate(payload.harvestDate);
-  const location = String(payload.location || user.location || '').trim();
+  const location = String(payload.location || owner.location || '').trim();
   const isOrganic = payload.category === 'Organic' || toBoolean(payload.isOrganic);
 
   target.name = String(payload.name || target.name || '').trim();
@@ -49,6 +79,7 @@ const assignProductFields = (target, payload, files, user) => {
   target.freshnessTag = getFreshnessTag(harvestDate);
   target.location = location;
   target.isAvailable = Number(target.quantity) > 0;
+  target.farmerId = owner._id;
 
   if (hasUploadedImages) {
     target.images = newImages;
@@ -64,7 +95,8 @@ const assignProductFields = (target, payload, files, user) => {
 };
 
 const createProduct = asyncHandler(async (req, res) => {
-  const product = assignProductFields(new Product({ farmerId: req.user._id }), req.body, req.files, req.user);
+  const owner = await resolveProductOwner(req.user, req.body.farmerId);
+  const product = assignProductFields(new Product({ farmerId: owner._id }), req.body, req.files, owner);
   await product.save();
 
   const populatedProduct = await Product.findById(product._id).populate('farmerId', 'name email phone location avatar businessName isVerified');
@@ -164,10 +196,11 @@ const updateProduct = asyncHandler(async (req, res) => {
     return sendResponse(res, 404, false, {}, 'Product not found');
   }
 
-  if (product.farmerId.toString() !== req.user._id.toString()) {
+  if (!canManageProduct(req.user, product)) {
     return sendResponse(res, 403, false, {}, 'You can only update your own product');
   }
 
+  const owner = await resolveProductOwner(req.user, req.body.farmerId, product.farmerId);
   const newImages = normalizeUploadedImages(req.files);
   const replaceImages = req.body.replaceImages === 'true';
 
@@ -176,7 +209,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.images = [];
   }
 
-  assignProductFields(product, req.body, replaceImages ? req.files : newImages.length ? req.files : [], req.user);
+  assignProductFields(product, req.body, replaceImages ? req.files : newImages.length ? req.files : [], owner);
 
   if (!replaceImages && newImages.length) {
     product.images = [...product.images, ...newImages].slice(0, 5);
@@ -198,7 +231,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     return sendResponse(res, 404, false, {}, 'Product not found');
   }
 
-  if (product.farmerId.toString() !== req.user._id.toString()) {
+  if (!canManageProduct(req.user, product)) {
     return sendResponse(res, 403, false, {}, 'You can only delete your own product');
   }
 
@@ -214,6 +247,9 @@ const getMyProducts = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  normalizeUploadedImages,
+  removeCloudinaryImages,
+  assignProductFields,
   createProduct,
   getProducts,
   getProductById,

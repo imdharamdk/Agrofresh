@@ -4,6 +4,7 @@ const Product = require('../models/Product');
 const Negotiation = require('../models/Negotiation');
 const asyncHandler = require('../utils/asyncHandler');
 const sendResponse = require('../utils/response');
+const { createProduct, updateProduct, deleteProduct } = require('./productController');
 
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find().select('-password').sort({ createdAt: -1 });
@@ -61,9 +62,21 @@ const getAnalytics = asyncHandler(async (req, res) => {
   );
 });
 
+const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate('farmerId', 'name businessName email location isVerified')
+    .sort({ createdAt: -1 });
+
+  sendResponse(res, 200, true, { products }, 'Admin products fetched successfully');
+});
+
 module.exports = {
   getUsers,
   verifyFarmer,
   getAllOrders,
-  getAnalytics
+  getAnalytics,
+  getAllProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct
 };
