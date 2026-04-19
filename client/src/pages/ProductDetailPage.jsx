@@ -29,7 +29,7 @@ const ProductDetailPage = () => {
     <div className="mx-auto max-w-7xl px-4 py-12">
       <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <img src={product.images?.[0]?.url} alt={product.name} className="h-[460px] w-full rounded-3xl object-cover shadow-soft" />
+          <img src={product.images?.[0]?.url || "https://placehold.co/900x460?text=AgroFresh"} alt={product.name} className="h-[460px] w-full rounded-3xl object-cover shadow-soft" />
           <div className="card">
             <h2 className="text-2xl font-bold text-slate-900">Description</h2>
             <p className="mt-4 leading-7 text-slate-600">{product.description}</p>
