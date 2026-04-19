@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$/;
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -64,11 +66,27 @@ userSchema.pre('save', async function save(next) {
     return next();
   }
 
+  if (BCRYPT_HASH_PATTERN.test(this.password)) {
+    return next();
+  }
+
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
+userSchema.methods.isPasswordHashed = function isPasswordHashed() {
+  return BCRYPT_HASH_PATTERN.test(this.password || '');
+};
+
+userSchema.methods.comparePassword = async function comparePassword(candidatePassword) {
+  if (!this.password) {
+    return false;
+  }
+
+  if (!this.isPasswordHashed()) {
+    return candidatePassword === this.password;
+  }
+
   return bcrypt.compare(candidatePassword, this.password);
 };
 

@@ -44,9 +44,15 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email.toLowerCase() });
+  const passwordMatches = user && (await user.comparePassword(password));
 
-  if (!user || !(await user.comparePassword(password))) {
+  if (!user || !passwordMatches) {
     return sendResponse(res, 401, false, {}, 'Invalid email or password');
+  }
+
+  if (!user.isPasswordHashed()) {
+    user.password = password;
+    await user.save();
   }
 
   const token = signToken(user._id);
