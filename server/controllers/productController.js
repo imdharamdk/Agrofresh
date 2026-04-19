@@ -31,6 +31,18 @@ const removeCloudinaryImages = async (images) => {
 
 const toBoolean = (value) => value === true || value === 'true';
 
+const parseImageList = (value) => {
+  if (!value) return null;
+  if (Array.isArray(value)) return value.filter(Boolean);
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : null;
+  } catch (error) {
+    return null;
+  }
+};
+
 const canManageProduct = (actor, product) => (
   actor?.role === 'admin' || product.farmerId.toString() === actor?._id?.toString()
 );
@@ -58,33 +70,32 @@ const resolveProductOwner = async (actor, farmerId, fallbackOwnerId) => {
   return actor;
 };
 
-const assignProductFields = (target, payload, files, owner) => {
-  const newImages = normalizeUploadedImages(files);
-  const hasUploadedImages = newImages.length > 0;
+const assignProductFields = (target, payload, owner) => {
+  const hasValue = (value) => value !== undefined && value !== null && value !== '';
   const imageUrl = String(payload.imageUrl || '').trim();
-  const harvestDate = parseHarvestDate(payload.harvestDate);
-  const location = String(payload.location || owner.location || '').trim();
-  const isOrganic = payload.category === 'Organic' || toBoolean(payload.isOrganic);
+  const harvestDate = hasValue(payload.harvestDate) ? parseHarvestDate(payload.harvestDate) : target.harvestDate;
+  const location = String(payload.location || target.location || owner.location || '').trim();
+  const isOrganic = payload.isOrganic !== undefined
+    ? toBoolean(payload.isOrganic)
+    : payload.category === 'Organic' || target.category === 'Organic' || Boolean(target.isOrganic);
 
   target.name = String(payload.name || target.name || '').trim();
   target.description = String(payload.description || target.description || '').trim();
   target.category = payload.category || target.category;
-  target.price = Number(payload.price);
-  target.bulkPrice = Number(payload.bulkPrice || 0);
-  target.minBulkQty = Number(payload.minBulkQty || 0);
-  target.quantity = Number(payload.quantity);
+  target.price = hasValue(payload.price) ? Number(payload.price) : Number(target.price || 0);
+  target.bulkPrice = hasValue(payload.bulkPrice) ? Number(payload.bulkPrice) : Number(target.bulkPrice || 0);
+  target.minBulkQty = hasValue(payload.minBulkQty) ? Number(payload.minBulkQty) : Number(target.minBulkQty || 0);
+  target.quantity = hasValue(payload.quantity) ? Number(payload.quantity) : Number(target.quantity || 0);
   target.unit = payload.unit || target.unit;
   target.isOrganic = isOrganic;
+  target.isFeatured = payload.isFeatured !== undefined ? toBoolean(payload.isFeatured) : Boolean(target.isFeatured);
   target.harvestDate = harvestDate;
   target.freshnessTag = getFreshnessTag(harvestDate);
   target.location = location;
   target.isAvailable = Number(target.quantity) > 0;
   target.farmerId = owner._id;
 
-  if (hasUploadedImages) {
-    target.images = newImages;
-    target.imageUrl = newImages[0].url;
-  } else if (imageUrl) {
+  if (imageUrl) {
     target.imageUrl = imageUrl;
   } else if (!target.imageUrl && target.images?.length) {
     target.imageUrl = target.images[0].url;
@@ -96,7 +107,14 @@ const assignProductFields = (target, payload, files, owner) => {
 
 const createProduct = asyncHandler(async (req, res) => {
   const owner = await resolveProductOwner(req.user, req.body.farmerId);
-  const product = assignProductFields(new Product({ farmerId: owner._id }), req.body, req.files, owner);
+  const product = assignProductFields(new Product({ farmerId: owner._id }), req.body, owner);
+  const uploadedImages = normalizeUploadedImages(req.files).slice(0, 5);
+
+  if (uploadedImages.length) {
+    product.images = uploadedImages;
+    product.imageUrl = uploadedImages[0].url;
+  }
+
   await product.save();
 
   const populatedProduct = await Product.findById(product._id).populate('farmerId', 'name email phone location avatar businessName isVerified');
@@ -201,21 +219,29 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 
   const owner = await resolveProductOwner(req.user, req.body.farmerId, product.farmerId);
-  const newImages = normalizeUploadedImages(req.files);
+  const uploadedImages = normalizeUploadedImages(req.files);
   const replaceImages = req.body.replaceImages === 'true';
+  const retainedImages = parseImageList(req.body.retainedImages);
 
-  if (replaceImages && newImages.length) {
+  if (replaceImages) {
     await removeCloudinaryImages(product.images);
-    product.images = [];
+    product.images = uploadedImages.slice(0, 5);
+  } else if (retainedImages) {
+    const keepSet = new Set(retainedImages);
+    const removedImages = product.images.filter((image) => !keepSet.has(image.url));
+    const keptImages = product.images.filter((image) => keepSet.has(image.url));
+    await removeCloudinaryImages(removedImages);
+    product.images = [...keptImages, ...uploadedImages].slice(0, 5);
+  } else if (uploadedImages.length) {
+    product.images = [...product.images, ...uploadedImages].slice(0, 5);
   }
 
-  assignProductFields(product, req.body, replaceImages ? req.files : newImages.length ? req.files : [], owner);
+  assignProductFields(product, req.body, owner);
 
-  if (!replaceImages && newImages.length) {
-    product.images = [...product.images, ...newImages].slice(0, 5);
-    if (!req.body.imageUrl) {
-      product.imageUrl = product.images[0]?.url || product.imageUrl;
-    }
+  if (product.images.length) {
+    product.imageUrl = product.images[0].url;
+  } else if (!req.body.imageUrl) {
+    product.imageUrl = '';
   }
 
   await product.save();

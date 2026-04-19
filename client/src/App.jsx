@@ -14,7 +14,6 @@ import CustomerDashboardPage from './pages/CustomerDashboardPage';
 import BusinessDashboardPage from './pages/BusinessDashboardPage';
 import DeliveryDashboardPage from './pages/DeliveryDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
-import AdminProductFormPage from './pages/AdminProductFormPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
@@ -48,8 +47,6 @@ const App = () => {
         </Route>
         <Route element={<ProtectedRoute roles={['admin']} />}>
           <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
-          <Route path="/admin-dashboard/products/add" element={<AdminProductFormPage />} />
-          <Route path="/admin-dashboard/products/edit/:id" element={<AdminProductFormPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>

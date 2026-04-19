@@ -41,6 +41,7 @@ router.post(
     body('location').optional().isString(),
     body('imageUrl').optional().isURL(),
     body('isOrganic').optional().isIn(booleanString),
+    body('isFeatured').optional().isIn(booleanString),
     validate
   ],
   createProduct
@@ -61,6 +62,7 @@ router.put(
     body('location').optional().isString(),
     body('imageUrl').optional().isURL(),
     body('isOrganic').optional().isIn(booleanString),
+    body('isFeatured').optional().isIn(booleanString),
     validate
   ],
   updateProduct
