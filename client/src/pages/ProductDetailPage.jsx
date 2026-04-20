@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { productApi, reviewApi } from '../api/agroApi';
 import { useCart } from '../contexts/CartContext';
+import { getProductGallery } from '../utils/productImages';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const ProductDetailPage = () => {
   if (!product) return <div className="mx-auto max-w-7xl px-4 py-20 text-slate-500">Loading product...</div>;
 
   const stockLabel = product.quantity === 0 ? 'Out of Stock' : product.quantity < 10 ? 'Low Stock' : `${product.quantity} in stock`;
-  const images = product.images?.length ? product.images : [{ url: 'https://placehold.co/900x460?text=AgroFresh' }];
+  const images = getProductGallery(product);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
@@ -35,7 +36,7 @@ const ProductDetailPage = () => {
         {/* Images */}
         <div className="space-y-4">
           <img
-            src={images[activeImg]?.url || 'https://placehold.co/900x460?text=AgroFresh'}
+            src={images[activeImg]?.url || images[0]?.url}
             alt={product.name}
             className="h-64 w-full rounded-3xl object-cover shadow-soft md:h-[400px] lg:h-[460px]"
           />

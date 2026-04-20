@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { adminApi } from '../api/agroApi';
+import { getPrimaryProductImage } from '../utils/productImages';
 
 const CATEGORY_OPTIONS = ['All', 'Vegetables', 'Fruits', 'Grains', 'Spices', 'Dairy', 'Organic'];
 const UNIT_OPTIONS = ['kg', 'gram', 'litre', 'piece'];
@@ -385,7 +386,7 @@ const AdminDashboardPage = () => {
               <div key={product._id} className="rounded-3xl border border-slate-100 p-4">
                 <div className="flex gap-4">
                   <img
-                    src={product.images?.[0]?.url || product.imageUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=500&q=80'}
+                    src={getPrimaryProductImage(product)}
                     alt={product.name}
                     className="h-24 w-24 rounded-2xl object-cover"
                   />

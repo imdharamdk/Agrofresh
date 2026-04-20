@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { getPrimaryProductImage } from '../utils/productImages';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -10,7 +11,7 @@ const ProductCard = ({ product }) => {
     <div className="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-soft">
       <Link to={`/products/${product._id}`}>
         <img
-          src={product.images?.[0]?.url || 'https://placehold.co/600x400?text=AgroFresh'}
+          src={getPrimaryProductImage(product)}
           alt={product.name}
           className="h-52 w-full object-cover"
         />

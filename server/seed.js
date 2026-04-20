@@ -50,6 +50,15 @@ const users = [
     isVerified: true
   },
   {
+    name: 'Dev Thakur',
+    email: 'dev@agrofresh.com',
+    password: 'password123',
+    role: 'farmer',
+    phone: '9817001122',
+    location: 'Shimla, Himachal Pradesh',
+    isVerified: true
+  },
+  {
     name: 'FreshMart Procurement',
     email: 'business@agrofresh.com',
     password: 'password123',
@@ -216,6 +225,42 @@ const productData = [
       img('photo-1540420773420-3366772f4999'),   // bottle gourd
     ]
   },
+  {
+    name: 'Local Lehsun',
+    description: 'Pahadi lehsun with strong aroma and tight white cloves.',
+    category: 'Vegetables', price: 120, bulkPrice: 102, minBulkQty: 8, unit: 'kg', quantity: 19,
+    farmerIndex: 4, location: 'Shimla, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1615477550927-6d8c4b2b21f5'),
+    ]
+  },
+  {
+    name: 'Himachali Green Peas',
+    description: 'Sweet mountain peas shelled from fresh pods, perfect for pulao and curries.',
+    category: 'Vegetables', price: 78, bulkPrice: 66, minBulkQty: 10, unit: 'kg', quantity: 20,
+    farmerIndex: 4, location: 'Kullu, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1583258292688-d0213dc5a3a8'),
+    ]
+  },
+  {
+    name: 'French Beans',
+    description: 'Tender French beans with bright green pods and a fresh snap.',
+    category: 'Vegetables', price: 68, bulkPrice: 58, minBulkQty: 10, unit: 'kg', quantity: 17,
+    farmerIndex: 4, location: 'Solan, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1515543904379-3d757afe72e1'),
+    ]
+  },
+  {
+    name: 'Zucchini',
+    description: 'Farm-fresh zucchini, mild flavour and tender flesh for saute and grills.',
+    category: 'Vegetables', price: 72, bulkPrice: 61, minBulkQty: 8, unit: 'kg', quantity: 16,
+    farmerIndex: 4, location: 'Shimla, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1594282486552-05b4d80fbb9f'),
+    ]
+  },
 
   // ── FRUITS ────────────────────────────────────────────────────────────
   {
@@ -314,6 +359,70 @@ const productData = [
       img('photo-1561181286-d3f19344d753'),     // sapota/chikoo
     ]
   },
+  {
+    name: 'Himachali Apples',
+    description: 'Crisp mountain apples hand-picked from high-altitude Himachal orchards.',
+    category: 'Fruits', price: 160, bulkPrice: 138, minBulkQty: 12, unit: 'kg', quantity: 26,
+    farmerIndex: 4, location: 'Shimla, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1567306226416-28f0efdc88ce'),
+      img('photo-1560806887-1e4cd0b6cbd6'),
+    ]
+  },
+  {
+    name: 'Gala Apples',
+    description: 'Sweet and aromatic Gala apples with a bright red-yellow skin.',
+    category: 'Fruits', price: 175, bulkPrice: 150, minBulkQty: 10, unit: 'kg', quantity: 18,
+    farmerIndex: 4, location: 'Kotkhai, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1560806887-1e4cd0b6cbd6'),
+    ]
+  },
+  {
+    name: 'Red Golden Apples',
+    description: 'Juicy Red Golden apples, firm texture and balanced sweetness.',
+    category: 'Fruits', price: 185, bulkPrice: 158, minBulkQty: 10, unit: 'kg', quantity: 16,
+    farmerIndex: 4, location: 'Rohru, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1570913149827-d2ac84ab3f9a'),
+    ]
+  },
+  {
+    name: 'Golden Apples',
+    description: 'Golden apples with mellow sweetness and smooth bite, orchard fresh.',
+    category: 'Fruits', price: 170, bulkPrice: 146, minBulkQty: 10, unit: 'kg', quantity: 15,
+    farmerIndex: 4, location: 'Kullu, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1567306226416-28f0efdc88ce'),
+    ]
+  },
+  {
+    name: 'Royal Apples',
+    description: 'Premium Royal apples from Himachal with dense crunch and deep colour.',
+    category: 'Fruits', price: 190, bulkPrice: 165, minBulkQty: 10, unit: 'kg', quantity: 14,
+    farmerIndex: 4, location: 'Theog, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1560806887-1e4cd0b6cbd6'),
+    ]
+  },
+  {
+    name: 'Red Chief Apples',
+    description: 'Dark red Red Chief apples, extra crisp and market premium grade.',
+    category: 'Fruits', price: 195, bulkPrice: 170, minBulkQty: 10, unit: 'kg', quantity: 13,
+    farmerIndex: 4, location: 'Shimla, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1570913149827-d2ac84ab3f9a'),
+    ]
+  },
+  {
+    name: 'Geromine Apples',
+    description: 'Fresh Geromine apples with glossy skin and sweet-tart orchard flavour.',
+    category: 'Fruits', price: 200, bulkPrice: 176, minBulkQty: 10, unit: 'kg', quantity: 12,
+    farmerIndex: 4, location: 'Kinnaur, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1567306226416-28f0efdc88ce'),
+    ]
+  },
 
   // ── GRAINS ────────────────────────────────────────────────────────────
   {
@@ -390,6 +499,25 @@ const productData = [
     farmerIndex: 2, location: 'Anand, Gujarat', isOrganic: false,
     images: [
       img('photo-1560806887-1735c0462745'),     // millet grains
+    ]
+  },
+  {
+    name: 'Local Rajmah',
+    description: 'Himachali rajmah with rich colour, creamy texture, and deep earthy flavour.',
+    category: 'Grains', price: 210, bulkPrice: 185, minBulkQty: 10, unit: 'kg', quantity: 18,
+    farmerIndex: 4, location: 'Kinnaur, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1515543904379-3d757afe72e1'),
+    ]
+  },
+  {
+    name: 'Mixed Hill Pulses',
+    description: 'Assorted local pulses from Himachal farms, ideal for wholesome home cooking.',
+    category: 'Grains', price: 165, bulkPrice: 142, minBulkQty: 12, unit: 'kg', quantity: 21,
+    farmerIndex: 4, location: 'Mandi, Himachal Pradesh', isOrganic: false,
+    images: [
+      img('photo-1612204103590-b4e3b7c60e9a'),
+      img('photo-1615484477778-ca3b77940c25'),
     ]
   },
 
@@ -508,6 +636,15 @@ const productData = [
     farmerIndex: 2, location: 'Anand, Gujarat', isOrganic: true,
     images: [
       img('photo-1589985270826-4b7bb135bc9d'),   // ghee jar
+    ]
+  },
+  {
+    name: 'Desi Cow Ghee',
+    description: 'Slow-cooked desi cow ghee with rich aroma, grainy texture, and golden finish.',
+    category: 'Dairy', price: 920, bulkPrice: 810, minBulkQty: 5, unit: 'kg', quantity: 9,
+    farmerIndex: 4, location: 'Shimla, Himachal Pradesh', isOrganic: true,
+    images: [
+      img('photo-1589985270826-4b7bb135bc9d'),
     ]
   },
   {
