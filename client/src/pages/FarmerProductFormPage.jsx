@@ -35,6 +35,7 @@ const FarmerProductFormPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [existingImages, setExistingImages] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -69,14 +70,24 @@ const FarmerProductFormPage = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
+    setError('');
+
+    if (imgMode === 'url' && imageUrl.trim() && !isValidUrl(imageUrl.trim())) {
+      setError('Please enter a valid public image URL.');
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = new FormData();
       Object.entries(formData).forEach(([k, v]) => payload.append(k, v));
 
       if (imgMode === 'url' && imageUrl.trim()) {
-        // Send as imageUrl field — backend stores it directly
         payload.set('imageUrl', imageUrl.trim());
+        if (id) {
+          // Replace existing product gallery so the pasted URL becomes the primary image immediately.
+          payload.set('replaceImages', 'true');
+        }
       } else if (imgMode === 'file' && imageFiles.length) {
         Array.from(imageFiles).forEach((f) => payload.append('images', f));
         if (id) payload.append('replaceImages', 'true');
@@ -88,6 +99,8 @@ const FarmerProductFormPage = () => {
         await productApi.create(payload);
       }
       navigate('/dashboard/farmer');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save product.');
     } finally {
       setSaving(false);
     }
@@ -101,6 +114,12 @@ const FarmerProductFormPage = () => {
         <h1 className="text-3xl font-black text-slate-900">{id ? 'Edit Product' : 'Add Product'}</h1>
         <p className="mt-1 text-sm text-slate-500">Fill in the details and add a product image.</p>
       </div>
+
+      {error && (
+        <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={submitHandler} className="card grid gap-4 md:grid-cols-2">
 
