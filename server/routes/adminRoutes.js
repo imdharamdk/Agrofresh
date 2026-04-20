@@ -6,6 +6,7 @@ const {
   getAllOrders,
   getAnalytics,
   getAllProducts,
+  syncCatalogData,
   createProduct,
   updateProduct,
   deleteProduct
@@ -24,6 +25,7 @@ router.put('/users/:id/verify', [param('id').isMongoId(), body('isVerified').opt
 router.get('/orders', getAllOrders);
 router.get('/analytics', getAnalytics);
 router.get('/products', getAllProducts);
+router.post('/sync-catalog', syncCatalogData);
 router.post(
   '/products',
   upload.array('images', 5),

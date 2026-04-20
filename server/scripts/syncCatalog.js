@@ -217,9 +217,7 @@ const buildSeedImageMap = () => {
   const source = fs.readFileSync(seedPath, 'utf8');
   const section = source.split('const productData = [')[1]?.split('];')[0] || '';
   const matches = [...section.matchAll(/name: '([^']+)'[\s\S]*?images:\s*\[\s*img\('([^']+)'\)/g)];
-  return new Map(
-    matches.map(([, name, photoId]) => [normalizeName(name), img(photoId)])
-  );
+  return new Map(matches.map(([, name, photoId]) => [normalizeName(name), img(photoId)]));
 };
 
 const applyProductData = (product, data, farmerId) => {
@@ -320,25 +318,37 @@ const backfillMissingImages = async () => {
   return updated;
 };
 
-const main = async () => {
-  await connectDB();
-
+const syncCatalog = async () => {
   const { farmer, created: farmerCreated } = await ensureFarmer();
   const productResult = await syncRequestedProducts(farmer._id);
   const backfilled = await backfillMissingImages();
 
-  console.log(JSON.stringify({
+  return {
     farmerCreated,
     farmerEmail: farmer.email,
     productsCreated: productResult.created,
     productsUpdated: productResult.updated,
     imageBackfills: backfilled
-  }, null, 2));
+  };
 };
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error('Catalog sync failed:', error);
-    process.exit(1);
-  });
+const runCli = async () => {
+  await connectDB();
+  const result = await syncCatalog();
+  console.log(JSON.stringify(result, null, 2));
+};
+
+if (require.main === module) {
+  runCli()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error('Catalog sync failed:', error);
+      process.exit(1);
+    });
+}
+
+module.exports = {
+  syncCatalog,
+  requestedProducts,
+  himachalFarmerSeed
+};

@@ -5,6 +5,7 @@ const Negotiation = require('../models/Negotiation');
 const asyncHandler = require('../utils/asyncHandler');
 const sendResponse = require('../utils/response');
 const { createProduct, updateProduct, deleteProduct } = require('./productController');
+const { syncCatalog } = require('../scripts/syncCatalog');
 
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find().select('-password').sort({ createdAt: -1 });
@@ -70,12 +71,18 @@ const getAllProducts = asyncHandler(async (req, res) => {
   sendResponse(res, 200, true, { products }, 'Admin products fetched successfully');
 });
 
+const syncCatalogData = asyncHandler(async (req, res) => {
+  const result = await syncCatalog();
+  sendResponse(res, 200, true, result, 'Catalog synced successfully');
+});
+
 module.exports = {
   getUsers,
   verifyFarmer,
   getAllOrders,
   getAnalytics,
   getAllProducts,
+  syncCatalogData,
   createProduct,
   updateProduct,
   deleteProduct
