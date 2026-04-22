@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const { Server } = require('socket.io');
 
 const connectDB = require('./config/db');
@@ -58,6 +59,70 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/admin', adminRoutes);
+
+// One-time seed trigger endpoint — protected by SEED_SECRET env var
+app.get('/api/run-seed', async (req, res) => {
+  const secret = req.query.secret;
+  if (!secret || secret !== process.env.SEED_SECRET) {
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+
+  try {
+    const User = require('./models/User');
+    const Product = require('./models/Product');
+    const { buildProductAiMeta } = require('./utils/aiSignals');
+
+    // Inline seed data import
+    const seedModule = require('./seed-data');
+    const { users: seedUsers, productData } = seedModule;
+
+    await Product.deleteMany();
+    await User.deleteMany({ email: { $in: seedUsers.map((u) => u.email) } });
+
+    const usersWithHashedPasswords = await Promise.all(
+      seedUsers.map(async (user) => ({
+        ...user,
+        password: await bcrypt.hash(user.password, 10)
+      }))
+    );
+
+    const createdUsers = await User.insertMany(usersWithHashedPasswords);
+    const farmers = createdUsers.filter((u) => u.role === 'farmer');
+    const farmerIds = farmers.map((u) => u._id);
+
+    const products = productData.map((data) => {
+      const product = {
+        name: data.name,
+        description: data.description,
+        category: data.category,
+        price: data.price,
+        bulkPrice: data.bulkPrice,
+        minBulkQty: data.minBulkQty,
+        unit: data.unit,
+        quantity: data.quantity,
+        farmerId: farmerIds[data.farmerIndex],
+        location: data.location,
+        images: data.images,
+        imageUrl: data.images[0]?.url || '',
+        isAvailable: data.quantity > 0,
+        isOrganic: !!data.isOrganic,
+        isFeatured: data.price > 100
+      };
+      product.aiMeta = buildProductAiMeta(product);
+      return product;
+    });
+
+    await Product.insertMany(products);
+
+    return res.json({
+      success: true,
+      message: `Seed complete: ${createdUsers.length} users, ${products.length} products inserted.`
+    });
+  } catch (err) {
+    console.error('Seed error:', err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 io.use(createSocketAuthMiddleware());
 
