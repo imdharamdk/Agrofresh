@@ -1,3 +1,12 @@
+require('dotenv').config();
+
+const bcrypt = require('bcryptjs');
+const connectDB = require('./config/db');
+const User = require('./models/User');
+const Product = require('./models/Product');
+const { buildProductAiMeta } = require('./utils/aiSignals');
+
+// Verified working Unsplash photo IDs (these are stable permanent URLs)
 const img = (photoId) => ({
   url: `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=800&q=80`,
   public_id: ''
@@ -80,7 +89,6 @@ const users = [
 ];
 
 // All photo IDs are real verified Unsplash photo IDs
-
 const productData = [
   // ── VEGETABLES ────────────────────────────────────────────────────────
   {
@@ -734,4 +742,54 @@ const productData = [
   },
 ];
 
-module.exports = { users, productData };
+const buildProducts = (farmerIds) => {
+  return productData.map((data) => {
+    const product = {
+      name: data.name,
+      description: data.description,
+      category: data.category,
+      price: data.price,
+      bulkPrice: data.bulkPrice,
+      minBulkQty: data.minBulkQty,
+      unit: data.unit,
+      quantity: data.quantity,
+      farmerId: farmerIds[data.farmerIndex],
+      location: data.location,
+      images: data.images,
+      imageUrl: data.images[0]?.url || '',
+      isAvailable: data.quantity > 0,
+      isOrganic: !!data.isOrganic,
+      isFeatured: data.price > 100
+    };
+    product.aiMeta = buildProductAiMeta(product);
+    return product;
+  });
+};
+
+const seed = async () => {
+  try {
+    await connectDB();
+    await Product.deleteMany();
+    await User.deleteMany({ email: { $in: users.map((u) => u.email) } });
+
+    const usersWithHashedPasswords = await Promise.all(
+      users.map(async (user) => ({
+        ...user,
+        password: await bcrypt.hash(user.password, 10)
+      }))
+    );
+
+    const createdUsers = await User.insertMany(usersWithHashedPasswords);
+    const farmers = createdUsers.filter((u) => u.role === 'farmer');
+    const products = buildProducts(farmers.map((u) => u._id));
+
+    await Product.insertMany(products);
+    console.log(`✅ Seed complete: ${createdUsers.length} users, ${products.length} products inserted.`);
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Seed failed:', error);
+    process.exit(1);
+  }
+};
+
+seed();
