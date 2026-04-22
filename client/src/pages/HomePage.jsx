@@ -9,7 +9,15 @@ const HomePage = () => {
   const [category, setCategory] = useState('');
 
   useEffect(() => {
-    productApi.list({ limit: 16, category }).then(({ data }) => setProducts(data.data.products)).catch(() => setProducts([]));
+    const params = { limit: 16 };
+
+    if (category === 'Organic') {
+      params.organic = 'true';
+    } else if (category) {
+      params.category = category;
+    }
+
+    productApi.list(params).then(({ data }) => setProducts(data.data.products)).catch(() => setProducts([]));
   }, [category]);
 
   const todaysHarvest = useMemo(() => {

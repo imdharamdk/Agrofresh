@@ -21,6 +21,12 @@ const ProductsPage = () => {
 
   useEffect(() => {
     const params = { ...filters, page, limit: 12 };
+
+    if (params.category === 'Organic') {
+      delete params.category;
+      params.organic = 'true';
+    }
+
     Object.keys(params).forEach((key) => !params[key] && delete params[key]);
     productApi.list(params).then(({ data }) => {
       setProducts(data.data.products);
