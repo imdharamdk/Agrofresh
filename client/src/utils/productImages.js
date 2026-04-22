@@ -15,6 +15,10 @@ const PRODUCT_IMAGE_BY_NAME = {
   "coriander leaves": "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=800&q=80",
   "cabbage": "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=800&q=80",
   "bottle gourd (lauki)": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+  "local lehsun": "https://images.unsplash.com/photo-1615477550927-6d8c4b2b21f5?auto=format&fit=crop&w=800&q=80",
+  "himachali green peas": "https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?auto=format&fit=crop&w=800&q=80",
+  "french beans": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+  "zucchini": "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=800&q=80",
   "farm mangoes (alphonso)": "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=800&q=80",
   "bananas (robusta)": "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80",
   "watermelon": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80",
@@ -25,6 +29,13 @@ const PRODUCT_IMAGE_BY_NAME = {
   "grapes (thompson)": "https://images.unsplash.com/photo-1423757736953-61e1f6a92abe?auto=format&fit=crop&w=800&q=80",
   "coconut": "https://images.unsplash.com/photo-1519162808019-7de1683fa2ad?auto=format&fit=crop&w=800&q=80",
   "chikoo (sapota)": "https://images.unsplash.com/photo-1561181286-d3f19344d753?auto=format&fit=crop&w=800&q=80",
+  "himachali apples": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=800&q=80",
+  "gala apples": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80",
+  "red golden apples": "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&w=800&q=80",
+  "golden apples": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=800&q=80",
+  "royal apples": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80",
+  "red chief apples": "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&w=800&q=80",
+  "geromine apples": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=800&q=80",
   "brown rice": "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80",
   "basmati rice": "https://images.unsplash.com/photo-1536304993881-ff86d42818e1?auto=format&fit=crop&w=800&q=80",
   "wheat flour (atta)": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=800&q=80",
@@ -45,6 +56,7 @@ const PRODUCT_IMAGE_BY_NAME = {
   "cow milk (full cream)": "https://images.unsplash.com/photo-1563636619-e9143da7f009?auto=format&fit=crop&w=800&q=80",
   "free range eggs": "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=800&q=80",
   "a2 desi ghee": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80",
+  "desi cow ghee": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80",
   "paneer (cottage cheese)": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80",
   "buffalo curd (dahi)": "https://images.unsplash.com/photo-1488477181228-bf5b1f3fbb1c?auto=format&fit=crop&w=800&q=80",
   "buttermilk (chaas)": "https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=800&q=80",
@@ -55,29 +67,48 @@ const PRODUCT_IMAGE_BY_NAME = {
   "organic coconut sugar": "https://images.unsplash.com/photo-1558642891-54be180ea339?auto=format&fit=crop&w=800&q=80",
   "organic sesame seeds (til)": "https://images.unsplash.com/photo-1612204103590-b4e3b7c60e9a?auto=format&fit=crop&w=800&q=80",
   "organic dry figs (anjeer)": "https://images.unsplash.com/photo-1580827754766-4c13a9ef0368?auto=format&fit=crop&w=800&q=80",
+  "local rajmah": "https://images.unsplash.com/photo-1515543904379-3d757afe72e1?auto=format&fit=crop&w=800&q=80",
+  "mixed hill pulses": "https://images.unsplash.com/photo-1612204103590-b4e3b7c60e9a?auto=format&fit=crop&w=800&q=80",
 };
 
 const normalizeName = (name = "") => String(name).trim().toLowerCase();
+const getMappedImage = (product) => PRODUCT_IMAGE_BY_NAME[normalizeName(product?.name)];
 
 export const getPrimaryProductImage = (product) => {
+  const mappedImage = getMappedImage(product);
+  if (mappedImage) return mappedImage;
+
   const galleryImage = product?.images?.find((image) => image?.url)?.url;
   if (galleryImage) return galleryImage;
 
   const directImage = String(product?.imageUrl || "").trim();
   if (directImage) return directImage;
 
-  const mappedImage = PRODUCT_IMAGE_BY_NAME[normalizeName(product?.name)];
-  return mappedImage || PLACEHOLDER_IMAGE;
+  return PLACEHOLDER_IMAGE;
 };
 
 export const getProductGallery = (product) => {
-  const images = Array.isArray(product?.images)
-    ? product.images.filter((image) => image?.url)
-    : [];
+  const urls = new Set();
+  const gallery = [];
 
-  if (images.length) return images;
+  const pushImage = (url) => {
+    const value = String(url || "").trim();
+    if (!value || urls.has(value)) return;
+    urls.add(value);
+    gallery.push({ url: value, public_id: "" });
+  };
 
-  return [{ url: getPrimaryProductImage(product), public_id: "" }];
+  pushImage(getMappedImage(product));
+
+  if (Array.isArray(product?.images)) {
+    product.images.forEach((image) => pushImage(image?.url));
+  }
+
+  pushImage(product?.imageUrl);
+
+  if (gallery.length) return gallery;
+
+  return [{ url: PLACEHOLDER_IMAGE, public_id: "" }];
 };
 
 export { PLACEHOLDER_IMAGE };
